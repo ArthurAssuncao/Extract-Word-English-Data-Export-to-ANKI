@@ -1,0 +1,112 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    background-color: transparent;
+    background-image: url('https://i.pinimg.com/736x/7b/27/87/7b2787382cb4a9fa7611549722078844.jpg');
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    font-family: Roboto 'Noto Sans' sans-serif Arial;
+    font-size: 20px;
+    text-align: center;
+    color: #111;
+    width: 96vw;
+    border-radius: 8px;
+    box-shadow: 0px 0 8px #ccc;
+}
+
+.replay-button svg {
+    width: 24px;
+    height: 24px;
+}
+
+.replay-button:hover svg circle {
+    fill: #39A093;
+    stroke: #39A093;
+}
+
+.replay-button svg circle {
+    fill: #96D4CC;
+    stroke: #96D4CC;
+    transition: all 0.5s ease;
+}
+
+.replay-button svg path {
+    stroke: #96D4CC;
+    fill: white;
+}
+
+.word,
+.word-back {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.word {
+    margin-bottom: 8px;
+}
+
+.front,
+.back {
+    border-radius: 8px;
+    padding: 12px 16px 16px 16px;
+}
+
+.front {
+    background-color: #bae1ff;
+}
+
+.front-in-back .front {
+    border-radius: 0px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.back {
+    background-color: #f0f8ff;
+    border-radius: 0px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    line-height: 1.5;
+}
+
+.cards-separator {
+    position: relative;
+    display: block;
+    height: 0px;
+    background: white;
+    width: 100%;
+}
+
+.phonetic {
+    font-size: 14px;
+    text-align: left;
+    font-style: italic;
+    margin-left: 0px;
+}
+
+.phonetic:before {
+    content: 'IPA: ';
+}
+
+.grammatical-classes {
+    font-size: 12px;
+}
+
+.grammatical-classes:before {
+    content: 'Classes: ';
+}
+
+.meanings {
+    font-size: 14px;
+    text-align: justify;
+}
+
+.word-in-example {
+    text-decoration: underline;
+}
