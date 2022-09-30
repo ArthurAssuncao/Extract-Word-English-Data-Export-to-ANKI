@@ -13,6 +13,20 @@ class WordInfo:
         self.antonyms = list(set(antonyms))
         self.meanings = meanings
 
+        self.fix_phonetics()
+
+    def fix_phonetics(self):
+        if (self.main_phonetic != ''):
+            self.main_phonetic = f'/{self.main_phonetic.replace("/", "")}/'
+        new_phonetics = []
+        for phonetic in self.phonetics:
+            new_phonetic = phonetic
+            phonetic_ipa = phonetic['ipa'].replace("/", "")
+            if (phonetic_ipa != ''):
+                new_phonetic['ipa'] = f'/{phonetic_ipa}/'
+                new_phonetics.append(new_phonetic)
+        self.phonetics = new_phonetics
+
     def to_dict(self):
         return {
             'word': self.word,
@@ -26,6 +40,12 @@ class WordInfo:
         }
 
     def main_audio_file(self, main_dialect='us'):
+        if (len(self.phonetics) == 0):
+            return {
+                'audio_url': '',
+                'audio_name': '',
+                'dialect': ''
+            }
         for phonetic in self.phonetics:
             if (phonetic['dialect'] == main_dialect):
                 return {
@@ -33,12 +53,14 @@ class WordInfo:
                     'audio_name': phonetic['audio_name'],
                     'dialect': phonetic['dialect']
                 }
-        if (len(self.phonetics) == 0):
-            return {
-                'audio_url': '',
-                'audio_name': '',
-                'dialect': ''
-            }
+        for phonetic in self.phonetics:
+            if (phonetic['audio_url'] != ''):
+                return {
+                    'audio_url': phonetic['audio_url'],
+                    'audio_name': phonetic['audio_name'],
+                    'dialect': phonetic['dialect']
+                }
+
         return {
             'audio_url': self.phonetics[0]['audio_url'],
             'audio_name': self.phonetics[0]['audio_name'],
@@ -51,6 +73,9 @@ class WordInfo:
             phonetics.add(phonetic['ipa'])
         phonetics.add(self.main_phonetic)
         phonetics_list = list(phonetics)
+        phonetics_list = list(filter(None, phonetics_list))
+        if (len(phonetics_list) == 0):
+            return ''
         if (len(phonetics_list) == 1):
             return phonetics_list[0]
         return ', '.join(phonetics_list)
@@ -82,14 +107,30 @@ class WordInfo:
             return antonyms_list[0]
         return ', '.join(antonyms_list)
 
+    def wrapper_word(self, text_to_wrap, word_to_wrap):
+        word = word_to_wrap.lower()
+        text = text_to_wrap.lower()
+        words_text = text.split(" ")
+        wrapper_words = []
+        for word_text in words_text:
+            new_word = word_text.lower()
+            if (word_text.replace(".", '').replace("!", '').replace("?", '').replace(",", '') == word):
+                new_word = new_word.replace(word, f"<span class='word-in-example'>{word_to_wrap}</span>")
+            wrapper_words.append(new_word)
+        new_text = ' '.join(wrapper_words)
+        new_text = new_text.capitalize()
+        return new_text
+
     def meanings_to_str(self, word):
         meanings = set()
         for meaning in self.meanings:
             example = meaning['example']
             if (example != ''):
-                example = example.lower().replace(word.lower(), f"<span class='word-in-example'>{word.lower()}</span>").capitalize()
+                example = self.wrapper_word(example, word)
                 meanings.add(f"{meaning['grammatical_class']}: {example}")
         meanings_list = list(meanings)
+        if (len(meanings_list) == 0):
+            return ''
         if (len(meanings_list) == 1):
             return meanings_list[0]
         meanings_list_wrapper_imperfect = "</p><p class='example'>".join(meanings_list)

@@ -67,6 +67,15 @@ class CrawlerCambridge:
         self.session.mount('http://', adapter)
         self.session.mount('https://', adapter)
 
+    def fix_phonetics(self, phonetics):
+        new_phonetics = []
+        for phonetic in phonetics:
+            new_phonetic = phonetic
+            phonetic_ipa = phonetic['ipa'].replace("/", "")
+            new_phonetic['ipa'] = f'/{phonetic_ipa}/'
+            new_phonetics.append(new_phonetic)
+        return new_phonetics
+
     def extract_from_cambridge(self, wordEnPT):
         word_en = wordEnPT.word_en
         word_pt = wordEnPT.word_pt
@@ -77,15 +86,16 @@ class CrawlerCambridge:
             print(result, '\n')
             data = result['data']
             audio_url = data['audio_url']
-            ipa = data['ipa']
-            ipa = [Phonetic(item, audio_url, self.dialect).to_dict() for item in ipa]
+            ipas = data['ipa']
+            ipas = [Phonetic(item, audio_url, self.dialect).to_dict() for item in ipas]
             # audio_name = audio_url[audio_url.rfind('/') + 1:]
             word_class = data['class']
 
             main_phonetic = ''
-            if (len(ipa) > 0):
-                main_phonetic = ipa[0]['ipa']
-            item = WordInfo(word_en, word_pt, main_phonetic, word_class, ipa, [], [], [])
+            if (len(ipas) > 0):
+                main_phonetic = f'/{ipas[0]["ipa"]}/'
+            ipas = self.fix_phonetics(ipas)
+            item = WordInfo(word_en, word_pt, main_phonetic, word_class, ipas, [], [], [])
             # if (audio_url != ''):
             #     audio_path = self.audio_word_path.format(audio_name)
             #     if (not self.audio_downloader.audio_is_exists(audio_path)):

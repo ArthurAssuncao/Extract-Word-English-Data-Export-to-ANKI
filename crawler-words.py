@@ -74,8 +74,8 @@ class CrawlerEnglishWords:
         self.cambridge_crawler = CrawlerCambridge(self.retry_factor, self.req_headers, AUDIO_WORD_PATH, ANKI_MEDIA_FILE_DIR)
 
     def request_word(self, word):
-        word = word.lower().replace(' ', '-')
-        url = self.api_dictionary.format(word)
+        new_word = word.lower().replace('to ', '').replace(' ', '-')
+        url = self.api_dictionary.format(new_word)
         print(url)
         try:
             req = self.session.get(url, headers=self.req_headers)
@@ -90,11 +90,14 @@ class CrawlerEnglishWords:
 
     def is_word_incomplete(self, word_info):
         without_phonetic = True
+        without_audio = True
         for phonetic in word_info.phonetics:
             if (phonetic['ipa'] != ''):
                 without_phonetic = False
+            if (phonetic['audio_url'] != ''):
+                without_audio = False
 
-        return without_phonetic
+        return without_phonetic or without_audio
 
     def get_words_info(self):
         words = []
@@ -102,8 +105,8 @@ class CrawlerEnglishWords:
         for word in self.words:
             is_used_other_crawler = False
             counter = counter + 1
-            word_en = word.word_en
-            word_pt = word.word_pt
+            word_en = word.word_en.lower()
+            word_pt = word.word_pt.lower()
             print(counter, word_en, word_pt)
             word_in_backup = self.backuper.get_backup_downloaded(word_en)
             word_info = word_in_backup
@@ -157,7 +160,7 @@ class CrawlerEnglishWords:
 
     def create_dir(self):
         try:
-            os.mkdir(self.type_data)
+            os.mkdir(WORDS_DIR)
         except FileExistsError:
             pass
 
