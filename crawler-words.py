@@ -29,7 +29,7 @@ TYPE_DATA = sys.argv[1]
 
 FILE_OUTPUT_HEADER = f"""\
 # separator:Semicolon
-# html:false
+# html:true
 # tags:{TYPE_DATA}
 # columns:Front Back Phonetic GrammaticalClasses Synonyms Antonyms Meanings
 # deck:english-{TYPE_DATA}
